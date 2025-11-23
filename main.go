@@ -109,8 +109,8 @@ func init() {
 		defaultKubeconfig = homeDir + "/.kube/config"
 	}
 
-	// Get default namespaces from environment or use "default"
-	defaultNamespaces := []string{"default"}
+	// Get default namespaces from environment or use empty (auto-discover)
+	var defaultNamespaces []string
 	if envNamespaces := os.Getenv("K8S_SEARCH_NAMESPACES"); envNamespaces != "" {
 		defaultNamespaces = strings.Split(envNamespaces, ",")
 		// Trim whitespace from each namespace
@@ -124,7 +124,7 @@ func init() {
 
 	// Persistent flags for all commands
 	rootCmd.PersistentFlags().StringVar(&kubeconfigPath, "kubeconfig", defaultKubeconfig, "Path to kubeconfig file (env: KUBECONFIG)")
-	rootCmd.PersistentFlags().StringSliceVar(&namespaces, "namespaces", defaultNamespaces, "Namespaces to search (comma-separated) (env: K8S_SEARCH_NAMESPACES)")
+	rootCmd.PersistentFlags().StringSliceVar(&namespaces, "namespaces", defaultNamespaces, "Namespaces to search (comma-separated, empty = auto-discover accessible namespaces) (env: K8S_SEARCH_NAMESPACES)")
 	rootCmd.PersistentFlags().StringVar(&contextName, "context", defaultContext, "Context to use (empty = current context) (env: K8S_SEARCH_CONTEXT)")
 
 	// Add subcommands

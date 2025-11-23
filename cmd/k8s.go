@@ -11,6 +11,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // K8sSearchConfig represents the configuration for K8s search
@@ -23,6 +24,14 @@ type K8sSearchConfig struct {
 // ValidateIP is a wrapper for k8s.ValidateIP for use in CLI
 func ValidateIP(ip string) bool {
 	return k8s.ValidateIP(ip)
+}
+
+// formatTargetPort properly formats a target port, handling both integer and string (named) ports
+func formatTargetPort(targetPort intstr.IntOrString) string {
+	if targetPort.Type == intstr.String {
+		return targetPort.StrVal
+	}
+	return fmt.Sprintf("%d", targetPort.IntVal)
 }
 
 // ListK8sContexts lists all contexts in kubeconfig
@@ -125,7 +134,7 @@ func SearchK8sByIP(config K8sSearchConfig, ip string) error {
 		for _, svc := range services {
 			ports := []string{}
 			for _, port := range svc.Ports {
-				ports = append(ports, fmt.Sprintf("%d:%d/%s", port.Port, port.TargetPort.IntVal, port.Protocol))
+				ports = append(ports, fmt.Sprintf("%d:%s/%s", port.Port, formatTargetPort(port.TargetPort), port.Protocol))
 			}
 
 			selector := []string{}
@@ -300,7 +309,7 @@ func SearchK8sByIPAllContexts(kubeconfigPath string, ip string, namespaces []str
 			for _, svc := range result.Services {
 				ports := []string{}
 				for _, port := range svc.Ports {
-					ports = append(ports, fmt.Sprintf("%d:%d/%s", port.Port, port.TargetPort.IntVal, port.Protocol))
+					ports = append(ports, fmt.Sprintf("%d:%s/%s", port.Port, formatTargetPort(port.TargetPort), port.Protocol))
 				}
 
 				selector := []string{}
