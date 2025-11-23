@@ -104,9 +104,12 @@ func init() {
 	if defaultKubeconfig == "" {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
-			homeDir = "~"
+			// Fallback to /root/.kube/config on Unix-like systems
+			// This is a reasonable default for containerized environments
+			defaultKubeconfig = "/root/.kube/config"
+		} else {
+			defaultKubeconfig = homeDir + "/.kube/config"
 		}
-		defaultKubeconfig = homeDir + "/.kube/config"
 	}
 
 	// Get default namespaces from environment or use empty (auto-discover)
