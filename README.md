@@ -9,7 +9,7 @@ export KUBECONFIG=xxxx
 
 - set namespace enviroment
 
-> in my work scean , i have no get ns permission , so i need to set 
+> in my work scene , i have no "get ns" permission , so i need to Preset namespaces list
 
 ```
 export K8S_SEARCH_NAMESPACES=test,xxx...
